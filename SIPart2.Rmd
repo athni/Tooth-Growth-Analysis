@@ -1,0 +1,99 @@
+---
+title: "Statistical Inference project Part 2"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Overview
+This report is for second part of the course project of the Coursera course "Statistical Inference" which is a part of specialization "Data Science". In this second part, we perform basic inferential analyses using the ToothGrowth data in the R datasets package.
+
+
+## 1. Load the ToothGrowth data and perform some basic exploratory data analyses
+
+```{r}
+#load the dataset
+library(datasets)
+data(ToothGrowth)
+
+# check the dataset details
+str(ToothGrowth)
+```
+```{r}
+# number of rows of dataset
+nrow(ToothGrowth)
+```
+
+```{r}
+# convert variable dose from numeric to factor
+ToothGrowth$dose <- as.factor(ToothGrowth$dose)
+
+# look at the dataset variables after conversion
+str(ToothGrowth)
+```
+
+## 3. Provide a basic summary of the data
+
+```{r}
+# summary statistics for all variables
+summary(ToothGrowth)
+```
+
+```{r}
+#cases per different doses and delivery methods
+table(ToothGrowth$dose, ToothGrowth$supp)
+```
+
+```{r}
+#loading ggplot2
+library(ggplot2)
+```
+```{r}
+ggplot(aes(x=dose, y=len), data=ToothGrowth) + geom_boxplot(aes(fill=dose))
+```
+
+```{r}
+# visualization of tooth growth as function of supplement type
+ggplot(aes(x=supp, y=len), data=ToothGrowth) + geom_boxplot(aes(fill=supp))
+```
+
+## 3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. 
+```{r}
+t.test(len ~ supp, data = ToothGrowth)
+```
+The confidence interval contains zero which indicates that we can not reject the null hypothesis which states that the different supplement types have no effect on tooth length
+
+```{r}
+# first create three sub-groups as per dose level pairs
+ToothGrowth.doses_0.5_1.0 <- subset (ToothGrowth, dose %in% c(0.5, 1.0)) 
+ToothGrowth.doses_0.5_2.0 <- subset (ToothGrowth, dose %in% c(0.5, 2.0)) 
+ToothGrowth.doses_1.0_2.0 <- subset (ToothGrowth, dose %in% c(1.0, 2.0)) 
+
+# Check for group differences due to different dose levels (0.5, 1.0)
+# assuming unequal variances between the two groups
+t.test(len ~ dose, data = ToothGrowth.doses_0.5_1.0)
+```
+
+```{r}
+# Check for group differences due to different dose levels (0.5, 2.0)
+t.test(len ~ dose, data = ToothGrowth.doses_0.5_2.0)
+```
+```{r}
+# Check for group differences due to different dose levels (1.0, 2.0)
+t.test(len ~ dose, data = ToothGrowth.doses_1.0_2.0)
+```
+For all the 3 subsets, the confidence levels does not contain 0 and mean length increases with increase in dose. We can reject the null hypothesis and put forward that increasing the dose increases in tooth length
+
+## 4. State your conclusions and the assumptions needed for your conclusions.
+
+CONCLUSIONS:
+1. supplement type has no impact on tooth growth
+2. Dosage impacts tooth length, increase of which increases the tooth length
+
+ASSUMPTIONS:
+1. The sample size of guinea pigs is 60, which is used for conclusions
+2. For the t-tests, the variances are assumed to be different for the two groups being compared. 
+
+
+
+
